@@ -37,10 +37,14 @@ do_cat(const char *path)
     fd = open(path, O_RDONLY);
     if (fd < 0) die(path);
     for (;;) {
-        n = read(fd, buf, sizeof buf); // readでストリームから読み込み
+        // ファイルディスクリプタfdが示すストリームからbufにbufのサイズ分、バイト列を読み込む
+        n = read(fd, buf, sizeof buf);
         if (n < 0) die(path);
         if (n == 0) break;
-        if (write(STDOUT_FILENO, buf, n) < 0) die(path); // writeで書き出す
+
+        // バッファbufの内容をnバイト分、標準出力へ書き出す
+        // readは必ずしもバッファサイズ分読み込むとは限らないためこうなっている
+        if (write(STDOUT_FILENO, buf, n) < 0) die(path);
     }
 
     if (close(fd) < 0) die(path);
